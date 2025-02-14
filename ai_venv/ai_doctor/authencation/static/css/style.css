@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+header {
+    background-color: #000000;
+    color: white;
+    padding: 1em 0;
+    text-align: center;
+}
+
+.hero {
+    text-align: center;
+    padding: 2em;
+    background-color: #f4f4f4;
+}
+
+.hero h1 {
+    font-size: 2.5em;
+    margin-bottom: 0.5em;
+}
+
+.hero p {
+    font-size: 1.2em;
+    margin-bottom: 1em;
+}
+
+.hero .cta-buttons {
+    margin-top: 1em;
+}
+
+.hero .cta-buttons a {
+    display: inline-block;
+    margin: 0 1em;
+    padding: 0.5em 1em;
+    background-color: #000000;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.features, .how-it-works, .testimonials, .ai-healthcare, .trust-security, .cta-footer {
+    padding: 2em;
+    text-align: center;
+}
+
+.features h2, .how-it-works h2, .testimonials h2, .ai-healthcare h2, .trust-security h2, .cta-footer h2 {
+    margin-bottom: 1em;
+}
+
+.features .feature-item, .how-it-works .step, .testimonials .testimonial, .ai-healthcare .info, .trust-security .info {
+    margin-bottom: 1em;
+}
+
+footer {
+    background-color: #ffffff;
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+}
