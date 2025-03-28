@@ -1,0 +1,69 @@
+{% load static %}
+{% block content %}
+{% include 'header.html' %}
+
+<div class="banner-w3l-main">
+    <br>
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-lg-6 col-md-8 col-sm-12">
+                <div class="card p-4 shadow-sm">
+                    <div class="card-body">
+                        <h1 class="text-center mb-4">Book Appointment with {{ doctor.username }}</h1>
+                        {% if messages %}
+                            <div class="container my-3">
+                                {% for message in messages %}
+                                    {% if 'book' in message.tags %}
+                                        <div class="alert alert-{{ message.tags }}">
+                                            {{ message }}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <form method="post" style="width:500px;">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="appointment_date" class="form-label">Select Appointment Date:</label>
+                                <input type="date" id="appointment_date" class="form-control" name="book_date" min="1900-01-01" max="2099-12-31" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="duty_time" class="form-label">Choose Operational Timing:</label>
+                                <select name="duty_time" id="duty_time" class="form-control" required>
+                                    <option value="">Select Timing</option>
+                                    {% for duty_time in duty_times %}
+                                        <option value="{{ duty_time.morning_start }}">
+                                            Morning: {{ duty_time.morning_start }}
+                                        </option>
+                                        <option value="{{ duty_time.evening_start }}">
+                                            Evening: {{ duty_time.evening_start }}
+                                        </option>
+                                    {% empty %}
+                                        <option value="">No duty timings available.</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Book Appointment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dd = String(tomorrow.getDate()).padStart(2, '0');
+        const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        const yyyy = tomorrow.getFullYear();
+        const formattedDate = yyyy + '-' + mm + '-' + dd;
+
+        document.getElementById('appointment_date').setAttribute('min', formattedDate);
+    });
+</script>
+
+{% include 'footer.html' %}
+{% endblock %}

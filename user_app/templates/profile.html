@@ -1,0 +1,76 @@
+{% load static %}
+{% include 'header.html' %}
+
+
+<style>
+    .profile-container {
+        width: 60%;
+        margin: auto;
+        margin-top: 200px;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px 0px #ccc;
+    }
+    .profile-image img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        display: block;
+        margin: auto;
+    }
+    .profile-info p {
+        font-size: 16px;
+        margin: 10px 0;
+    }
+    .btn-edit {
+        display: block;
+        width: 200px;
+        margin: 20px auto;
+        text-align: center;
+        padding: 10px;
+        background-color: #2068a8;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .btn-edit:hover {
+        background-color: #3c5973;
+    }
+</style>
+<div class="banner-w3l-main">
+    <br>
+    <div class="container mt-5 mb-5">
+<div class="profile-container">
+    <h2 class="text-center">Profile</h2>
+
+    <div class="profile-image text-center">
+        {% if user.image %}
+            <img src="{{ user.image.url }}" alt="Profile Image">
+        {% else %}
+            <img src="{% static 'images/default.png' %}" alt="Default Profile Image">
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <div class="profile-info text-center">
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Phone:</strong> {{ user.phone }}</p>
+        <p><strong>Place:</strong> {{ user.place }}</p>
+
+        {% if user.usertype == 2 %}
+            <p><strong>Specialization:</strong> {{ user.specialization }}</p>
+            <p><strong>Qualification:</strong> {{ user.qualification }}</p>
+            <p><strong>Experience:</strong> {{ user.experience }}</p>
+        {% endif %}
+    </div>
+
+    <a href="/edit_profile" class="btn-edit">Edit Profile</a>
+    <a href="/change_password" class="btn-edit" style="background-color: #555;">Reset Password</a>
+</div>
+</div>
+</div>
+
+{% include 'footer.html' %}

@@ -1,0 +1,114 @@
+{% load static %}
+{% include 'header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Treatment</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Edit Treatment</h2>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.as_p }}
+            </div>
+            <div class="form-group">
+                <h3>Symptoms</h3>
+                <div id="symptoms">
+                    {{ formset.management_form }}
+                    {% for symptom_form in formset %}
+                        <div class="symptom">
+                            {{ symptom_form.as_p }}
+                            <button type="button" class="delete-symptom btn btn-danger" data-id="{{ forloop.counter0 }}">Delete</button>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <button type="button" id="addSymptoms" class="btn btn-secondary">Add More Symptoms</button>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+
+    <script src="{% static 'js/script.js' %}"></script>
+    <script type="text/template" id="empty_form">
+        <div class="symptom">
+            {% with form=formset.empty_form %}
+                {{ form.as_p }}
+            {% endwith %}
+        </div>
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('addSymptoms').addEventListener('click', function () {
+                const symptomsContainer = document.getElementById('symptoms');
+                const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+                const currentFormCount = document.querySelectorAll('.symptom').length;
+                const newFormIndex = currentFormCount;
+
+                const newFormTemplate = document.getElementById('empty_form').innerHTML.replace(/__prefix__/g, newFormIndex);
+                symptomsContainer.insertAdjacentHTML('beforeend', newFormTemplate);
+                totalForms.value = currentFormCount + 1;
+            });
+        });
+    </script>
+</body>
+</html>
+{% include 'footer.html' %}

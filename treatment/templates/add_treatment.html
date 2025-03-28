@@ -1,0 +1,136 @@
+{% load static %}
+{% include 'header.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Form</title>
+    <style>
+        .reg-form input[type="text"],.reg-form textarea ,.reg-form select, .reg-form input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        .reg-form label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .reg-form button[type="submit"] {
+            background-color: #2068a8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .reg-form button[type="submit"]:hover {
+            background-color: #3c5973;
+        }
+        i{
+            color:white;
+        }
+    </style>
+</head>
+<body>
+  
+    <div class="banner-w3l-main">
+        
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-lg-6 col-md-8 col-sm-12">
+          
+                <div class="card p-4 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="text-center mb-4"><b>{{title}}</b></h2>
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-danger">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                        <form class="reg-form" action="" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                {{ form.as_p }}
+                            </div>
+                            <div id="symptoms" style="display: none;">
+                                <h3>Add Symptoms</h3>
+                                {{ formset.management_form }}
+                            </div>
+                            <button type="button" id="addSymptoms" class="btn w-10">Add More Symptoms</button>
+                            <br>
+                            <br>
+                            <button type="submit" class="btn-primary w-100">SUBMIT</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="{% static 'js/script.js' %}"></script>
+<script type="text/template" id="empty_form">
+    <div class="symptom mb-3">
+        {% with form=formset.empty_form %}
+            <div class="symptom">
+                {{ form.as_p }}
+            </div>
+        {% endwith %}
+    </div>
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('addSymptoms').addEventListener('click', function() {
+                const symptomsContainer = document.getElementById('symptoms');
+                const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+                const currentFormCount = document.querySelectorAll('.symptom').length;
+                const newFormIndex = currentFormCount;
+
+                if (symptomsContainer.style.display === "none") {
+                    symptomsContainer.style.display = "block";
+                }
+
+                const newFormTemplate = document.getElementById('empty_form').innerHTML.replace(/__prefix__/g, newFormIndex);
+                symptomsContainer.insertAdjacentHTML('beforeend', newFormTemplate);
+                totalForms.value = currentFormCount + 1;
+            });
+
+            document.getElementById('diseaseForm').addEventListener('submit', function(event) {
+                const diseaseName = document.getElementById('disease_name').value;
+                const symptoms = document.querySelectorAll('.symptom');
+
+                let allFieldsFilled = true;
+
+                if (!diseaseName) {
+                    allFieldsFilled = false;
+                }
+
+                symptoms.forEach(function(symptom) {
+                    const name = symptom.querySelector('[name$="symptom"]').value.trim();
+
+                    if (!name) {
+                        allFieldsFilled = false;
+                    }
+                });
+
+                if (!allFieldsFilled) {
+                    event.preventDefault();
+                    document.getElementById('message').innerText = 'Please fill in all fields.';
+                }
+            });
+        });
+</script>
+</body>
+
+</html>
+{% endblock %}
+{% include 'footer.html' %}

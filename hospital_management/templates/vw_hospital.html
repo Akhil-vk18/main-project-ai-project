@@ -1,0 +1,96 @@
+{% load static %}
+{% include 'header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospitals</title>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+        }
+        .container1 {
+            margin-top: 130px;
+        }
+        .hospital-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .hospital-name {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #2068a8;
+        }
+        .hospital-address {
+            color: #555;
+        }
+        .btn-details {
+            background-color: #ff8c00;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .btn-details:hover {
+            background-color: #e07b00;
+        }
+        .delete-icon {
+            color: white;
+            background-color: #ff4d4d;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 300px;
+        }
+
+        .delete-icon:hover {
+            background-color: #ff3333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container1">
+        <h1 class="text-center mb-4">Hospitals</h1>
+        {% if hospitals %}
+            <div class="row">
+                {% for hospital in hospitals %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="hospital-card">
+                            <div class="hospital-name">{{ hospital.username }}</div>
+                            <div class="hospital-address">{{ hospital.place }}</div>
+                            <div class="hospital-address">{{ hospital.email }}</div>
+                            <div class="hospital-address">{{ hospital.phone }}</div>
+                            <p>{{ hospital.description|truncatewords:20 }} 
+
+
+                                <a href="/delete_hospital/{{ hospital.id }}/" onclick="return confirm('Are you sure you want to delete {{ hospital.username }}?')" class="delete-icon ">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </p>
+                        <p>
+                           
+                        </p>    
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                No hospitals available.
+            </div>
+        {% endif %}
+    </div>
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>
+{% include 'footer.html' %}

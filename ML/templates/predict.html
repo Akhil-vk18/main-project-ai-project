@@ -1,0 +1,182 @@
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Diagnosis Chat</title>
+    <link rel="stylesheet" href="{% static 'css/predict.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #f7f7f7, #ebebeb);
+            margin: 0;
+            padding: 0;
+        }
+
+        .chat-container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-header {
+            text-align: center;
+            color: #444;
+            margin-bottom: 20px;
+        }
+
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: #007bff;
+            color: white;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .bot-message {
+            background: #e6e6e6;
+            color: #333;
+            align-self: flex-start;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .input-container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            background-color: #4caf50;
+            transition: background-color 0.3s ease;
+        }
+
+        .input-container button:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h3>Medical Diagnosis Chat</h3>
+        </div>
+        <div class="chat-box" id="chat-box">
+            <!-- Chat messages will be appended here -->
+        </div>
+        <div class="input-container">
+            <input type="text" id="symptom" name="symptom" aria-label="Symptom Input" placeholder="Enter a symptom">
+            <button type="button" id="add">Send</button>
+            <button type="button" id="predict">Predict</button>
+        </div>
+    </div>
+    <form id="predict-form" method="POST" style="display:none;">
+        {% csrf_token %}
+        <input type="hidden" id="selected_symptoms" name="selected_symptoms" />
+    </form>
+    <script>
+        $(document).ready(function () {
+            let symptoms = [];
+
+            $('#add').click(function () {
+                var symptom = $('#symptom').val().trim();
+                if (symptom === '') {
+                    alert('Please enter a symptom.');
+                    return;
+                }
+                if (symptoms.includes(symptom)) {
+                    alert('You have already added this symptom.');
+                    return;
+                }
+                $('#chat-box').append(`
+                    <div class="chat-message user-message">${symptom}</div>
+                `);
+                symptoms.push(symptom);
+                $('#symptom').val('');
+                $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+            });
+
+            $('#predict').click(function () {
+                if (symptoms.length === 0) {
+                    alert('Please enter at least one symptom.');
+                    return;
+                }
+                $('#selected_symptoms').val(JSON.stringify(symptoms));
+                $('#predict-form').submit();
+            });
+
+            $('#predict-form').on('submit', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: '',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        let disease = response.predictions[0];
+                        let treatmentHTML = disease.treatment_list.map(treatment => `
+                            <li>${treatment.treatment_name} - ${treatment.details} by 
+                                <a href="${treatment.doctor_link}">Dr. ${treatment.doctor_username}</a>
+                            </li>
+                        `).join('');
+
+                        $('#chat-box').append(`
+                            <div class="chat-message bot-message">
+                                <strong>Prediction Result:</strong><br>
+                                <strong>Disease:</strong> ${disease.disease}<br>
+                                <strong>Probability:</strong> ${disease.probability}%<br>
+                                <strong>Description:</strong> ${disease.description}<br>
+                                <strong>Precautions:</strong> ${disease.precautions.join(", ")}<br>
+                                <strong>Treatments:</strong>
+                                <ul>${treatmentHTML}</ul>
+                            </div>
+                        `);
+                        $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                    },
+                    error: function (response) {
+                        $('#chat-box').append(`
+                            <div class="chat-message bot-message">Error: ${response.responseText}</div>
+                        `);
+                        $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                    }
+                });
+            });
+        });
+    </script>
+</body>

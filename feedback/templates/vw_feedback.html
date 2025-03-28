@@ -1,0 +1,86 @@
+{% load static %}
+{% include 'header.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback List</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f2f2f2; /* Light background for contrast */
+        }
+        .banner-w3l-main {
+            padding: 50px 0; /* Add padding for top and bottom */
+        }
+        .feedback-card {
+            background-color: #ffffff; /* White background for cards */
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Deeper shadow for depth */
+            transition: transform 0.3s; /* Animation for hover effect */
+        }
+        .feedback-card:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+        }
+        .feedback-card h2 {
+            color: #007bff; /* Bootstrap primary color for the title */
+            font-size: 1.5rem; /* Adjust font size for a tile layout */
+            margin-bottom: 10px; /* Space below the title */
+        }
+        .feedback-card .rating {
+            color: orange;
+            font-size: 1.5rem; /* Increase font size for better visibility */
+        }
+        .feedback-card p {
+            color: #555; /* Dark gray for text */
+        }
+        .feedback-card small {
+            color: #999; /* Light gray for the date */
+        }
+        .alert {
+            margin-top: 20px; /* Add margin to alert */
+        }
+    </style>
+</head>
+<body>
+    <div class="banner-w3l-main">
+        <div class="container">
+            <h1 class="my-4 text- text-light">Feedback Details</h1>
+            <div class="row">
+                {% if feedback %}
+                    <div class="col-md-4">
+                        <div class="feedback-card">
+                            <h2>{{ feedback.user_id.username|upper }}</h2>
+                            <p class="rating">
+                                {% if feedback.rating %}
+                                    {% for i in "★★★★★"|slice:":5" %}
+                                        {% if forloop.counter <= feedback.rating %}
+                                            &#9733;  <!-- Filled star -->
+                                        {% else %}
+                                            &#9734;  <!-- Empty star -->
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span>No rating given</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Comments:</strong> {{ feedback.comments|default:"No comments" }}</p>
+                            <small class="text-muted">Created at: {{ feedback.created_at }}</small>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-warning text-center" role="alert">No feedback available.</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}
+{% include 'footer.html' %}

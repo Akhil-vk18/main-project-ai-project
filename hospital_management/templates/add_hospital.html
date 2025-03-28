@@ -1,0 +1,69 @@
+{% load static %}
+{% include 'header.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Form</title>
+    <style>
+        .reg-form input[type="text"], .reg-form input[type="email"], .reg-form input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        .reg-form label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .reg-form button[type="submit"] {
+            background-color: #2068a8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .reg-form button[type="submit"]:hover {
+            background-color: #3c5973;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner-w3l-main">
+        <br>
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-lg-6 col-md-8 col-sm-12">
+                <br>
+                <br>  <br>
+                <br>
+                <div class="card p-4 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="text-center mb-4"><b>{{title}}</b></h2>
+                        <form class="reg-form" action="" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                {{ form.as_p }}
+                            </div>
+                            <button type="submit" class="btn-primary w-100">{{title}}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="{% static 'js/script.js' %}"></script>
+
+</html>
+{% endblock %}
+{% include 'footer.html' %}

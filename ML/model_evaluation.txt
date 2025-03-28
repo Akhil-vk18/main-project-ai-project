@@ -1,0 +1,6 @@
+ExtraTrees: 1.0000
+RandomForest: 1.0000
+GradientBoost: 1.0000
+LightGBM: 1.0000
+XGBoost: 1.0000
+CatBoost: 1.0000

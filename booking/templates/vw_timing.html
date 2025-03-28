@@ -1,0 +1,98 @@
+{% load static %}
+{% include 'header.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Timings</title>
+    <style>
+        .timing-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .timing-card p {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .edit-btn, .delete-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background-color: #2068a8;
+            color: white;
+            text-decoration: none;
+        }
+
+        .edit-btn:hover {
+            background-color: #154a71;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            text-decoration: none;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="banner-w3l-main">
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-lg-8 col-md-10 col-sm-12">
+                <h2 class="text-center mb-4" style="color: white;"><b>Manage Timings</b></h2>
+
+
+                <div class="card p-4 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="text-center mb-4">Existing Timings</h3>
+                        {% if existing_timings %}
+                            {% for timing in existing_timings %}
+                                <div class="timing-card">
+                                    <p><b>Morning:</b> {{ timing.morning_start }} - {{ timing.morning_end }}</p>
+                                    <p><b>Evening:</b> {{ timing.evening_start }} - {{ timing.evening_end }}</p>
+
+                                    <!-- Edit and Delete Buttons -->
+                                    <div class="action-buttons">
+                                        <a href="{% url 'edit_timing' timing.id %}" class="edit-btn">Edit</a>
+                                        <a href="{% url 'delete_timing' timing.id %}" class="delete-btn" onclick="return confirm('Are you sure you want to delete this timing?');">Delete</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-center">No timings available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+{% endblock %}
+{% include 'footer.html' %}

@@ -1,0 +1,74 @@
+{% load static %}
+{% include 'header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby Hospitals</title>
+    <style>
+        .container {
+            margin-top: 30px;
+        }
+        .hospital-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .hospital-name {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #2068a8;
+        }
+        .distance {
+            color: #555;
+            font-size: 1rem;
+        }
+        .btn-details {
+            background-color: #ff8c00;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .btn-details:hover {
+            background-color: #e07b00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <br><br><br><br><br>
+        <h1 class="text-center mb-4">Nearby Hospitals</h1>
+        {% if nearby_hospitals %}
+            <div class="row">
+                {% for hospital in nearby_hospitals %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="hospital-card">
+                            <div class="hospital-name">{{ hospital.username }}</div>
+                            <div class="hospital-name">{{ hospital.email }}</div>
+                            <div class="hospital-name">{{ hospital.phone }}</div>
+                           
+                            <p class="distance">Distance: {{ hospital.dis }} km</p>
+                            <p>{{ hospital.description|truncatewords:20 }}</p>
+                            
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                No nearby hospitals found.
+            </div>
+        {% endif %}
+    </div>
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>
+{% include 'footer.html' %}

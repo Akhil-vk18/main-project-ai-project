@@ -1,0 +1,169 @@
+{% load static %}
+{% block content %}
+{% include 'header.html' %}
+
+<style>
+    body {
+        background-color: #f4f6f8;
+        font-family: 'Arial', sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #1c1c1c;
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    td {
+        color: #333;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .download-btn {
+        display: inline-block;
+        background-color: #0a7d0c;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .download-btn:hover {
+        background-color: #2e9101;
+    }
+</style>
+
+<div class="banner-w3l-main">
+    <div class="container my-5">
+        <h1 class="text-center text-light mb-4">Your Bookings</h1>
+        {% if messages %}
+        {% for message in messages %}
+            {% if 'booked' in message.tags %}
+                <div class="alert alert-success alert-dismissable fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% elif 'error' in message.tags %}
+                <div class="alert alert-danger alert-dismissable fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    
+    {% if request.session.ut == 1 %}
+        {% if bookings %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Doctor</th>
+                        <th>Booking Time</th>
+                        <th>Booking Date</th>
+                        <th>Feedback</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.dr_id.username }}</td>
+                            <td>{{ booking.booking_time }}</td>
+                            <td>{{ booking.booking_date }}</td>
+                            <td>
+                                {% if booking.f_status == Null %}
+                                    <a href="/feedback_add/{{ booking.id }}/">Add Feedback</a>
+                                {% else %}
+                                    <a href="/vw_feedback/{{ booking.id }}/">View Feedback</a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if booking.c_status == "cancelled" %}
+                                    <span style="color: red; font-weight: bold;">Booking Cancelled</span>
+                                {% elif booking.booking_date_object and booking.booking_date_object < today %}
+                                    <span style="color: grey; font-weight: bold;">Booking Date Passed</span>
+                                {% else %}
+                                    <a href="/cancel_booking/{{ booking.id }}/" class="download-btn" 
+                                       onclick="return confirm('Are you sure you want to cancel the booking?')">Cancel Appointment</a>
+                                    <a href="/download_appointment_pdf/{{ booking.id }}/" class="download-btn">Download Appointment</a>
+                                {% endif %}
+                            </td>
+                            
+                            
+                            
+                            
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-center">No bookings found.</p>
+        {% endif %}
+    {% else %}
+        {% if bookings_dr %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Booking Time</th>
+                        <th>Booking Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings_dr %}
+                        <tr>
+                            <td>{{ booking.user_id.username }}</td>
+                            <td>{{ booking.booking_time }}</td>
+                            <td>{{ booking.booking_date }}</td>
+                            <td>
+                                <a href="/vw_feedback/{{ booking.id }}/">View Feedback</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-center">No bookings found.</p>
+        {% endif %}
+    {% endif %}
+</div>
+</div>
+{% include 'footer.html' %}
+{% endblock %}

@@ -1,0 +1,153 @@
+
+{% load static %}
+
+{% block content %}
+{% include 'header.html' %}
+
+<style>
+    .edit-profile-container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px 0px #ccc;
+    }
+    .edit-profile-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        font-weight: bold;
+    }
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .profile-image {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    .profile-image img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+    }
+    .update-btn {
+        width: 100%;
+        background-color: #2068a8;
+        color: white;
+        padding: 10px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        margin-top: 15px;
+        border-radius: 5px;
+    }
+    .update-btn:hover {
+        background-color: #3c5973;
+    }
+    .error {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+</style>
+<br><br>
+<br><br>
+<div class="edit-profile-container mt-5" >
+    <h2>Edit Profile</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="profile-image">
+            {% if form.instance.image %}
+                <img src="{{ form.instance.image.url }}" alt="Profile Image">
+            {% else %}
+                <img src="{% static 'images/default.png' %}" alt="Default Profile Image">
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Username:</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="error">{{ form.username.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">Email:</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="error">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.phone.id_for_label }}">Phone:</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+                <div class="error">{{ form.phone.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.place.id_for_label }}">Place:</label>
+            {{ form.place }}
+            {% if form.place.errors %}
+                <div class="error">{{ form.place.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.image.id_for_label }}">Profile Picture:</label>
+            <input type="file" name="{{ form.image.name }}" id="{{ form.image.id_for_label }}" class="form-control">
+            {% if form.image.errors %}
+                <div class="error">{{ form.image.errors }}</div>
+            {% endif %}
+        </div>
+
+        {% if request.session.ut == 2 %}  {# If user is a doctor #}
+            <hr>
+            <h4>Doctor Details</h4>
+
+            <div class="form-group">
+                <label for="{{ form.specialization.id_for_label }}">Specialization:</label>
+                {{ form.specialization }}
+                {% if form.specialization.errors %}
+                    <div class="error form-group">{{ form.specialization.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.qualification.id_for_label }}">Qualification:</label>
+                {{ form.qualification }}
+                {% if form.qualification.errors %}
+                    <div class="error">{{ form.qualification.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.experience.id_for_label }}">Experience:</label>
+                {{ form.experience }}
+                {% if form.experience.errors %}
+                    <div class="error">{{ form.experience.errors }}</div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <button type="submit" class="update-btn">Update Profile</button>
+    </form>
+</div>
+
+{% include 'footer.html' %}
+{% endblock %}

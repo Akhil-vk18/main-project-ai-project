@@ -1,0 +1,110 @@
+{% load static %}
+{% include 'header.html' %}
+{% block content %}
+<style>
+    .form-row input {
+        border-radius: 5px;
+        padding: 10px;
+        width: 100%;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    
+    button.delete-symptom {
+        background-color: #ff4c4c;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        padding: 6px 10px;
+    }
+    
+    button.delete-symptom:hover {
+        background-color: #ff1a1a;
+    }
+    
+</style>
+<div class="banner-w3l-main">
+    <div class="container">
+        <div class="register-container p-5 bg-white shadow" style="border-radius: 15px; max-width: 600px; margin: auto;">
+            <h3 class="text-center mb-4" style="color: #333;">Edit Disease</h3>
+            <form method="post" enctype="multipart/form-data" class="form-group" id="editDiseaseForm">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+               
+                <div id="symptoms-container">
+                    {{ formset.management_form }}
+                    {% for form in formset %}
+                    <h4 style="margin-top: 30px;">Symptoms</h4>
+                        {% if form.symptom.value %}
+                            <div class="form-row symptom d-flex align-items-center mb-3">
+                                <div class="col-md-10">
+                                    {{ form.symptom }}
+                                </div>
+                                <div class="col-md-2 text-right">
+                                    <button type="button" class="btn btn-danger btn-sm delete-symptom">Delete</button>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+
+                <div class="mt-4 text-center">
+                    {% comment %} <button type="button" id="addSymptomButton" class="btn btn-warning btn-lg mr-3">Add New Symptom</button> {% endcomment %}
+                    <button type="submit" class="btn btn-success btn-lg">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden Template for New Symptom Fields -->
+    <script type="text/template" id="empty_symptom_form">
+        <div class="form-row symptom d-flex align-items-center mb-3">
+            <div class="col-md-10">
+                {% with form=formset.empty_form %}
+                    {{ form.symptom }}
+                {% endwith %}
+            </div>
+            <div class="col-md-2 text-right">
+                <button type="button" class="btn btn-danger btn-sm delete-symptom">Delete</button>
+            </div>
+        </div>
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addSymptomButton = document.getElementById('addSymptomButton');
+            const symptomsContainer = document.getElementById('symptoms-container');
+            const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+            const emptyFormTemplate = document.getElementById('empty_symptom_form').innerHTML;
+
+            // Add new symptom field
+            addSymptomButton.addEventListener('click', function() {
+                const currentFormCount = document.querySelectorAll('.symptom').length;
+                const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, currentFormCount);
+                symptomsContainer.insertAdjacentHTML('beforeend', newFormHtml);
+                totalForms.value = currentFormCount + 1;
+
+                // Attach delete functionality to new symptom
+                attachDeleteFunctionality();
+            });
+
+            // Function to delete symptom field
+            function attachDeleteFunctionality() {
+                const deleteButtons = document.querySelectorAll('.delete-symptom');
+                deleteButtons.forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        const symptomRow = this.closest('.symptom');
+                        symptomRow.remove();
+                        totalForms.value = document.querySelectorAll('.symptom').length;
+                    });
+                });
+            }
+
+            // Initial call to attach delete functionality on page load
+            attachDeleteFunctionality();
+        });
+    </script>
+</div>
+{% endblock %}
+{% include 'footer.html' %}

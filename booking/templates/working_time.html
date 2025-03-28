@@ -1,0 +1,148 @@
+{% load static %}
+{% include 'header.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Form</title>
+    <style>
+        .reg-form input[type="text"],select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        .reg-form label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .reg-form button[type="submit"] {
+            background-color: #2068a8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        button[type="button"] {
+            background-color: lightblue;
+        }
+        
+        .reg-form button[type="submit"]:hover {
+            background-color: #3c5973;
+        }
+        
+        i {
+            color: white;
+        }
+
+        .symptom {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+  
+    <div class="banner-w3l-main">
+        <div class="container mt-5 mb-5">
+            <div class="row justify-content-center align-items-center min-vh-100">
+                <div class="col-lg-6 col-md-8 col-sm-12">
+                    <div class="card p-4 shadow-sm">
+                        <div class="card-body">
+                            <h2 class="text-center mb-4"><b>{{ title }}</b></h2>
+                            {% if messages %}
+                                {% for message in messages %}
+                                    {% if 'workingtime'%}
+                                    <div class="alert alert-{{ message.tags }} alert-danger">{{ message }}</div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            <form class="reg-form" action="" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    {{ formset.management_form }}
+                                    {% for form in formset %}
+                                        <div class="symptom mb-3">
+                                            {{ form.as_p }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            
+                                <div id="symptoms" style="display: none;"></div>
+                                
+                                <button type="button" id="addSymptoms" class="btn w-10">Add More Timings</button>
+                                <br>
+                                <br>
+                                <button type="submit" class="btn-primary w-100">SUBMIT</button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/template" id="empty_form">
+        <div class="symptom mb-3">
+            {% with form=formset.empty_form %}
+                {{ form.as_p }}
+            {% endwith %}
+        </div>
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('addSymptoms').addEventListener('click', function() {
+                const symptomsContainer = document.getElementById('symptoms');
+                const totalForms = document.querySelector('#id_form-TOTAL_FORMS');  // Make sure to target the right ID
+                const currentFormCount = parseInt(totalForms.value);
+                const newFormIndex = currentFormCount;
+        
+                if (symptomsContainer.style.display === "none") {
+                    symptomsContainer.style.display = "block";
+                }
+        
+                const newFormTemplate = document.getElementById('empty_form').innerHTML.replace(/__prefix__/g, newFormIndex);
+                symptomsContainer.insertAdjacentHTML('beforeend', newFormTemplate);
+                totalForms.value = newFormIndex + 1;  // Increment the total forms count
+            });
+        
+            document.querySelector('form').addEventListener('submit', function(event) {
+                let allFieldsFilled = true;
+                const diseaseName = document.getElementById('disease_name').value;
+                const symptoms = document.querySelectorAll('.symptom');
+        
+                if (!diseaseName.trim()) {
+                    allFieldsFilled = false;
+                }
+        
+                symptoms.forEach(function(symptom) {
+                    const name = symptom.querySelector('[name$="symptom"]').value.trim();
+                    if (!name) {
+                        allFieldsFilled = false;
+                    }
+                });
+        
+                if (!allFieldsFilled) {
+                    event.preventDefault();
+                    alert('Please fill in all fields.');
+                }
+            });
+        });
+        
+    </script>
+</body>
+</html>
+{% endblock %}
+{% include 'footer.html' %}

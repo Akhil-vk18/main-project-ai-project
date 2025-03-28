@@ -1,0 +1,220 @@
+{% load static %}
+{% block content %}
+{% include 'header.html' %}
+<head>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+</head>
+
+<style>
+    /* General Styles */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7fa;
+    }
+
+    .banner-w3l-main {
+        padding: 50px 0;
+        background-color: #e9ecef;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: #333;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    /* Card Styles */
+    .res-card {
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
+        height: 420px;
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .res-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .res-card h1 {
+        font-size: 1.8rem;
+        color: #007bff;
+        margin-bottom: 15px;
+    }
+
+    .res-card p {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+    .res-card .fa {
+        font-size: 1.5rem;
+        color: #007bff;
+        margin-right: 10px;
+    }
+
+    .res-card .btn-info {
+        background-color: #fd7e14;
+        border: none;
+        padding: 10px 20px;
+        color: white;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+    .res-card .btn-info:hover {
+        background-color: #e67e22;
+    }
+
+    .star-rating i {
+        color: #f39c12;
+        font-size: 1.2rem;
+    }
+
+    /* Modal Styling */
+    .modal-backdrop {
+        background-color: transparent !important; /* No backdrop visible */
+    }
+
+    .modal-dialog {
+        margin-top: 200px;
+        max-width: 600px;
+    }
+
+    .modal-header {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+    }
+
+    .modal-body {
+        background-color: #f9f9f9;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 767px) {
+        .res-card {
+            height: auto;
+            padding: 15px;
+        }
+
+        .res-card h1 {
+            font-size: 1.5rem;
+        }
+
+        .res-card p {
+            font-size: 0.9rem;
+        }
+
+        .modal-dialog {
+            margin-top: 20px;
+        }
+    }
+</style>
+
+<div class="banner-w3l-main">
+    <div class="container">
+        <h2 class="text-center mb-4" style="color: white;"><b>Doctors</b></h2>
+
+
+        <div id="results">
+            <!-- Card View -->
+            <div class="row justify-content-center">
+                {% if doc %}
+                    <div class="col-md-4 mb-4">
+                        <div class="res-card">
+                            <h1>{{ doc.username }}</h1>
+                            <p>Place:{{ doc.place }}</p>
+                            <p>Phone no:{{ doc.phone }}</p>
+                            <p>Specialization:{{ doc.specialization }}</p>
+                            <p>Qualification:{{ doc.qualification }}</p>
+                            <p>Eperience:{{ doc.experience }}</p>
+                            
+
+                            <p>
+                                <a href="{{ doc.location }}">
+                                    <i class="fa fa-map-marker" aria-hidden="true"></i> View Location
+                                </a>
+                            </p>
+                            <p class="text-danger">
+                                {% if current_user.usertype == 1 %}
+                                    Distance: {{ doc.dis|default:"0" }} m
+                                {% endif %}
+                            </p>
+                            <p>
+                                <a href="/book_appointment/{{ doc.id }}/" class="delete-icon">
+                                    <i class="fa fa-ticket"></i> Book Appointment
+                                </a>
+                            </p>
+                            <p>
+                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#feedbackModal{{ doc.id }}">
+                                    Feedbacks
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Modal -->
+                    <div class="modal fade" id="feedbackModal{{ doc.id }}" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel{{ doc.id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="feedbackModalLabel{{ doc.id }}">Feedback for {{ doc.username }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {% for feedback in feedbacks %}
+                                        {% if feedback.booking_id.dr_id == doc %}
+                                            <ul class="list-group">
+                                                <li class="list-group-item">
+                                                    <strong>{{ feedback.user_id.username|upper }}</strong>: {{ feedback.comments|default:"No comments" }}
+                                                    <div class="star-rating">
+                                                        {% for i in "12345" %}
+                                                            {% if forloop.counter <= feedback.rating %}
+                                                                <i class="fa fa-star"></i>
+                                                            {% else %}
+                                                                <i class="fa fa-star" style="color: lightgray;"></i>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                    <small class="text-muted">{{ feedback.created_at }}</small>
+                                                </li>
+                                            </ul>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const closeButton = document.getElementById('modal');
+
+closeButton.addEventListener('click', () => {
+  modal.style.display = 'none'; 
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,78 @@
+{% load static %}
+{% include 'header.html' %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Feedback</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 2rem;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+        .star-rating input:checked ~ label {
+            color: orange;
+        }
+
+        .star-rating input:hover ~ label {
+            color: orange;
+        }
+        h1.my-4,
+        label[for="rating"],
+        .form-group label {
+        color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner-w3l-main">
+        <div class="container">
+            <h1 class="my-4">Add Feedback for Booking #{{ booking.id }}</h1>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <div class="form-group">
+                        <label for="rating">Ratings :</label>
+                        <div class="star-rating">
+                            <input type="radio" id="5-stars" name="rating" value="5" {% if form.rating.value == 5 %}checked{% endif %}>
+                            <label for="5-stars" class="star">&#9733;</label>
+                            <input type="radio" id="4-stars" name="rating" value="4" {% if form.rating.value == 4 %}checked{% endif %}>
+                            <label for="4-stars" class="star">&#9733;</label>
+                            <input type="radio" id="3-stars" name="rating" value="3" {% if form.rating.value == 3 %}checked{% endif %}>
+                            <label for="3-stars" class="star">&#9733;</label>
+                            <input type="radio" id="2-stars" name="rating" value="2" {% if form.rating.value == 2 %}checked{% endif %}>
+                            <label for="2-stars" class="star">&#9733;</label>
+                            <input type="radio" id="1-star" name="rating" value="1" {% if form.rating.value == 1 %}checked{% endif %}>
+                            <label for="1-star" class="star">&#9733;</label>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="form-group">
+                    {{ form.comments.label_tag }}
+                    {{ form.comments }}
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Feedback</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}
+{% include 'footer.html' %}

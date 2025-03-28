@@ -1,0 +1,128 @@
+{% load static %}
+{% include 'header.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treatment List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .table-container {
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+        }
+
+        .table-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .delete-icon {
+            color: white;
+            background-color: #ff4d4d;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .delete-icon:hover {
+            background-color: #ff3333;
+        }
+
+        .table-action {
+            text-align: center;
+        }
+
+        .table-container p {
+            font-size: 16px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner-w3l-main">
+    <div class="table-container">
+        <h2 class="table-title">Treatment List</h2>
+        {% if treatment %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Treatment</th>
+                    <th>Disease</th>
+                    <th>Details</th>
+                    <th>Symptoms</th>
+                    <th>Action</th>
+                </tr>
+               
+            </thead>
+            <tbody>
+                {% for treatment in treatment %}
+                <tr>
+                    <td>#{{ treatment.id }}</td>
+                    <td>{{ treatment.treatment_name }}</td>
+                    <td>{{ treatment.disease.disease }}</td>
+                    <td>{{ treatment.details }}</td>
+                    <td>
+                        {% for symptom in treatment.symptoms.all %}
+                            {{ symptom.symptom }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td class="table-action">
+                        <a href="/edit_treatment/{{ treatment.id }}/"  class="delete-icon">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="/delete_treatment/{{ treatment.id }}/" onclick="return confirm('Are you sure you want to delete {{ treatment.treatment_name }}?')" class="delete-icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                {% endfor %}
+                
+            </tbody>
+        </table>
+        {% else %}
+        <p>No treatments added</p>
+{% endif %}
+    </div>
+    </div>
+</body>
+</html>
+{% endblock %}
+{% include 'footer.html' %}
