@@ -143,69 +143,84 @@ def prioritize_by_dataset(all_predictions, selected_symptoms):
     filtered_counts = {disease: count for disease, count in all_predictions.items() if disease in dataset_matched_diseases}
 
     return Counter(filtered_counts).most_common(5)
+
+
+
+
 @csrf_exempt
 def predict_disease_view(request):
     if request.method == 'POST':
         selected_symptoms = json.loads(request.POST.get('selected_symptoms', '[]'))
         selected_symptoms = [s.lower().strip() for s in selected_symptoms]
 
+        print(f"🔍 Selected Symptoms: {selected_symptoms}")
+
+        # Find valid diseases from dataset
         valid_diseases = set()
         for symptom in selected_symptoms:
             if symptom in symptom_to_diseases:
                 valid_diseases.update(symptom_to_diseases[symptom])
 
+        print(f"🔍 Matched diseases from dataset: {valid_diseases}")
+
         if not valid_diseases:
             return JsonResponse({'predictions': []})
 
+        # Create symptom vector
         features = create_symptom_vector(selected_symptoms)
         num_symptoms = sum(features[0])
 
-        all_predictions = Counter()
-        for name, model in models.items():
-            top5 = predict_top_5(model, features, num_symptoms, valid_diseases)
-            all_predictions.update(top5)
-            print(f"🔹 {name}: {top5}")
+        # Use only RandomForest model for prediction
+        model = models["RandomForest"]
+        top_predictions = predict_top_5(model, features, num_symptoms, valid_diseases)
 
-        final_top5 = prioritize_by_dataset(all_predictions, selected_symptoms) or []
+        print(f"🔹 RandomForest Predictions: {top_predictions}")
 
-        if not final_top5:
+        # Select top 2 predictions
+        if not top_predictions:
             return JsonResponse({'predictions': []})
 
-        final_top5 = sorted(final_top5, key=lambda x: (x[1] / len(models)) * 100, reverse=True)
+        predictions = []
+        for disease in top_predictions[:2]:  # Get only top 2 diseases
+            probability = 100 / len(top_predictions)  # Distribute 100% probability equally
 
-        disease, count = final_top5[0]
-        probability = (count / len(models)) * 100
+            # Get disease description
+            description = (
+                desc.loc[desc['Disease'] == disease, 'Description'].iloc[0]
+                if disease in desc["Disease"].unique() else "No description available"
+            )
 
-        description = (
-            desc.loc[desc['Disease'] == disease, 'Description'].iloc[0]
-            if disease in desc["Disease"].unique() else "No description available"
-        )
+            # Get precautions
+            precautions = []
+            if disease in prec["Disease"].unique():
+                c = np.where(prec['Disease'] == disease)[0][0]
+                for j in range(1, len(prec.iloc[c])):
+                    value = prec.iloc[c, j]
+                    if pd.notna(value):  # Avoid NaN issues
+                        precautions.append(str(value))
 
-        precautions = []
-        if disease in prec["Disease"].unique():
-            c = np.where(prec['Disease'] == disease)[0][0]
-            for j in range(1, len(prec.iloc[c])):
-                precautions.append(prec.iloc[c, j])
+            # Get treatments from database
+            treatment_list = []
+            treatments = Treatments.objects.filter(disease__disease=disease)
+            for treatment in treatments:
+                treatment_list.append({
+                    'treatment_name': treatment.treatment_name,
+                    'details': treatment.details,
+                    'doc_id': treatment.dr_id.id,
+                    'doctor_username': treatment.dr_id.username,
+                    'doctor_link': f"/vw_doc_details/{treatment.dr_id.id}/"
+                })
 
-        treatment_list = []
-        treatments = Treatments.objects.filter(disease__disease=disease)
-        for treatment in treatments:
-            treatment_list.append({
-                'treatment_name': treatment.treatment_name,
-                'details': treatment.details,
-                'doc_id': treatment.dr_id.id,
-                'doctor_username': treatment.dr_id.username,
-                'doctor_link': f"/vw_doc_details/{treatment.dr_id.id}/"
+            predictions.append({
+                'disease': disease,
+                'description': description if description else "No description available",
+                'precautions': precautions if precautions else ["No specific precautions available"],
+                'treatment_list': treatment_list
             })
 
-        prediction = {
-            'disease': disease,
-            'probability': float(probability),
-            'description': description,
-            'precautions': precautions,
-            'treatment_list': treatment_list
-        }
+        print("\n✅ Final Predictions (from RandomForest ):")
+        
 
-        return JsonResponse({'predictions': [prediction]})
+        return JsonResponse({'predictions': predictions})
 
     return render(request, 'predict.html')
